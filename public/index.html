@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#006B3F">
+  <title>Log In - QuickMart POS</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="login-page">
+
+  <div class="login-card">
+
+    <!-- Ghana flag accent stripe -->
+    <div class="flag-stripe">
+      <div class="red"></div>
+      <div class="gold"></div>
+      <div class="green"></div>
+    </div>
+
+    <div class="login-card-body">
+
+      <div class="brand">
+        <div class="brand-logo">&#128722;</div>
+        <div class="brand-name">QuickMart POS</div>
+        <div class="brand-subtitle">Supermarket Management System</div>
+      </div>
+
+      <div class="error-message" id="errorMessage"></div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="email">Username/Email</label>
+          <!-- type="text", not "email": the browser would refuse to
+               submit a username because it has no "@" in it. -->
+          <input type="text" id="email" placeholder="your username  or  you@yourshop.com" required autocomplete="username">
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-wrapper">
+            <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password">
+            <button type="button" class="toggle-password" id="togglePassword">Show</button>
+          </div>
+        </div>
+
+        <!-- Only shown when one email is used at more than one shop -->
+        <div class="form-group" id="shopCodeGroup" style="display:none">
+          <label for="shopCode">Shop ID</label>
+          <input type="text" id="shopCode" placeholder="e.g. QM-2026-0001">
+          <small class="text-muted">That login is registered at more than one shop.</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="loginBtn">Log In</button>
+      </form>
+
+      <div class="register-prompt">
+        <p>Don't have an account yet?</p>
+        <a href="register.html" class="btn btn-secondary btn-block">Register Your Shop</a>
+        <small class="text-muted">Free for 14 days. No card needed.</small>
+      </div>
+
+      <!-- Demo accounts - delete this block before a real shop uses it -->
+      <div class="demo-section">
+        <h3>Demo Accounts</h3>
+        <div class="demo-cards">
+          <div class="demo-card" data-email="admin@supermarket.com" data-password="admin123">
+            <div class="role-icon">&#128119;</div>
+            <div class="role-name">Owner</div>
+            <div class="role-email">admin@supermarket.com</div>
+            <div class="role-pass">admin123</div>
+          </div>
+          <div class="demo-card" data-email="cashier@supermarket.com" data-password="cashier123">
+            <div class="role-icon">&#128176;</div>
+            <div class="role-name">Cashier</div>
+            <div class="role-email">cashier@supermarket.com</div>
+            <div class="role-pass">cashier123</div>
+          </div>
+          <div class="demo-card" data-email="inventory@supermarket.com" data-password="inventory123">
+            <div class="role-icon">&#128230;</div>
+            <div class="role-name">Inventory</div>
+            <div class="role-email">inventory@supermarket.com</div>
+            <div class="role-pass">inventory123</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="notification-toast" id="toast"></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+
+  <script>
+    /**
+     * ============================================================
+     *  Login
+     * ============================================================
+     *  The password is no longer checked here in the browser. It
+     *  goes to the server, which compares it against a bcrypt hash
+     *  and sends back a token if it matches.
+     * ============================================================
+     */
+
+    const loginForm    = document.getElementById('loginForm');
+    const emailInput   = document.getElementById('email');
+    const passwordEl   = document.getElementById('password');
+    const shopCodeEl   = document.getElementById('shopCode');
+    const shopCodeGrp  = document.getElementById('shopCodeGroup');
+    const errorMessage = document.getElementById('errorMessage');
+    const loginBtn     = document.getElementById('loginBtn');
+
+    // Already logged in? Go straight through.
+    document.addEventListener('DOMContentLoaded', function () {
+      if (Auth.isLoggedIn()) {
+        const user = Auth.getCurrentUser();
+        window.location.href = Auth.homePageFor(user.role);
+      }
+    });
+
+    loginForm.addEventListener('submit', async function (event) {
+      event.preventDefault();
+      errorMessage.classList.remove('show');
+
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Logging in...';
+
+      try {
+        const user = await Auth.login(
+          emailInput.value.trim(),
+          passwordEl.value,
+          shopCodeEl.value.trim() || undefined
+        );
+
+        window.location.href = Auth.homePageFor(user.role);
+
+      } catch (error) {
+        if (error.message.includes('more than one shop')) {
+          shopCodeGrp.style.display = 'block';
+        }
+
+        errorMessage.textContent = error.message;
+        errorMessage.classList.add('show');
+
+        const card = document.querySelector('.login-card');
+        card.style.animation = 'shake 0.3s';
+        setTimeout(() => { card.style.animation = ''; }, 300);
+
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Log In';
+      }
+    });
+
+    document.getElementById('togglePassword').addEventListener('click', function () {
+      const showing = passwordEl.type === 'text';
+      passwordEl.type = showing ? 'password' : 'text';
+      this.textContent = showing ? 'Show' : 'Hide';
+    });
+
+    document.querySelectorAll('.demo-card').forEach(function (card) {
+      card.addEventListener('click', function () {
+        emailInput.value = card.getAttribute('data-email');
+        passwordEl.value = card.getAttribute('data-password');
+        errorMessage.classList.remove('show');
+        document.querySelectorAll('.demo-card').forEach(c => c.style.borderColor = '');
+        card.style.borderColor = 'var(--primary)';
+      });
+    });
+  </script>
+
+  <style>
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25%      { transform: translateX(-8px); }
+      75%      { transform: translateX(8px); }
+    }
+    .register-prompt {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--gray-200);
+      text-align: center;
+    }
+    .register-prompt p {
+      font-size: 14px;
+      color: var(--gray-500);
+      margin-bottom: 10px;
+    }
+    .btn-block { width: 100%; }
+    .register-prompt small { display: block; margin-top: 8px; font-size: 12px; }
+  </style>
+
+</body>
+</html>

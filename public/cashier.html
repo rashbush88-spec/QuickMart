@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickMart Ghana - Cashier POS</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#006B3F">
+
+  <!-- ── Stylesheets ─────────────────────────────────── -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/cashier.css">
+</head>
+<body>
+
+  <!-- ════════════════════════════════════════════════════
+       TOP NAVIGATION BAR
+       Shows the store name, cashier info, and logout
+  ════════════════════════════════════════════════════ -->
+  <nav class="pos-navbar">
+    <div class="nav-brand">
+      <h1 data-shop-name>QuickMart POS</h1>
+    </div>
+    <div class="nav-info">
+      <span id="cashier-name">Cashier: --</span>
+      <span id="current-date"></span>
+      <button id="my-sales-btn" class="btn btn-my-sales" onclick="openMySales()">My Sales Today</button>
+      <button id="logout-btn" class="btn btn-logout" onclick="Auth.logout()">Logout</button>
+    </div>
+  </nav>
+
+  <!-- ════════════════════════════════════════════════════
+       MAIN POS LAYOUT (split into left + right panels)
+  ════════════════════════════════════════════════════ -->
+  <main class="pos-container">
+
+    <!-- ────────────────────────────────────────────────
+         LEFT SIDE (60%) - Product Selection
+    ──────────────────────────────────────────────── -->
+    <section class="products-panel">
+
+      <!-- Search Bar -->
+      <div class="search-bar">
+        <input
+          type="text"
+          id="search-input"
+          class="search-input"
+          placeholder="Search by name or product code..."
+        >
+      </div>
+
+      <!-- Barcode / Product Code Lookup -->
+      <div class="barcode-scanner-bar">
+        <span class="scan-icon">&#128248;</span>
+        <input
+          type="text"
+          id="barcode-input"
+          class="barcode-input"
+          placeholder="Scan or type barcode / product code, then press Enter"
+          autocomplete="off"
+        >
+        <button class="btn-scan-lookup" id="scan-lookup-btn" onclick="triggerBarcodeLookup()">
+          Lookup
+        </button>
+      </div>
+
+      <!-- Scan Result Preview (shows matched product details) -->
+      <div id="scan-result" class="scan-result" style="display:none;">
+        <div class="scan-result-info">
+          <span class="scan-result-code" id="scan-result-code"></span>
+          <span class="scan-result-name" id="scan-result-name"></span>
+          <span class="scan-result-price" id="scan-result-price"></span>
+        </div>
+        <button class="btn-add-scanned" id="btn-add-scanned" onclick="addScannedProduct()">
+          + Add to Cart
+        </button>
+      </div>
+
+      <!-- Category Filter Pills - built from this shop's categories by buildCategoryPills() -->
+      <div class="category-pills">
+        <button class="pill active" data-category="All">All</button>
+      </div>
+
+      <!-- Product Grid (populated by JavaScript) -->
+      <div id="product-grid" class="product-grid">
+        <!-- Product cards will be inserted here -->
+      </div>
+
+    </section>
+
+    <!-- ────────────────────────────────────────────────
+         RIGHT SIDE (40%) - Cart & Payment
+    ──────────────────────────────────────────────── -->
+    <section class="cart-panel">
+
+      <!-- Cart Header -->
+      <div class="cart-header">
+        <h2>
+          Shopping Cart
+          <span id="cart-count" class="cart-badge">0</span>
+        </h2>
+        <button id="clear-cart-btn" class="btn btn-clear">Clear Cart</button>
+      </div>
+
+      <!-- Cart Items List -->
+      <div id="cart-items" class="cart-items">
+        <p class="empty-cart-msg">Cart is empty. Add products to get started.</p>
+      </div>
+
+      <!-- Cart Summary -->
+      <div class="cart-summary">
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span id="cart-subtotal">GH&#8373; 0.00</span>
+        </div>
+        <div class="summary-row">
+          <span>Tax (0%)</span>
+          <span id="cart-tax">GH&#8373; 0.00</span>
+        </div>
+        <div class="summary-row total-row">
+          <span>Total</span>
+          <span id="cart-total">GH&#8373; 0.00</span>
+        </div>
+      </div>
+
+      <!-- Payment Section -->
+      <div class="payment-section">
+        <h3>Payment Method</h3>
+
+        <!-- Payment Method Buttons -->
+        <div class="payment-methods">
+          <button class="pay-method-btn" data-method="cash">Cash</button>
+          <button class="pay-method-btn" data-method="momo">Mobile Money</button>
+          <button class="pay-method-btn" data-method="card">Card</button>
+        </div>
+
+        <!-- Cash Payment Fields (hidden by default) -->
+        <div id="cash-fields" class="payment-fields" style="display: none;">
+          <label for="amount-tendered">Amount Tendered (GH&#8373;)</label>
+          <input type="number" id="amount-tendered" class="payment-input" min="0" step="0.01" placeholder="0.00">
+          <div class="change-display">
+            Change: <strong id="change-amount">GH&#8373; 0.00</strong>
+          </div>
+        </div>
+
+        <!-- Mobile Money Fields (hidden by default) -->
+        <div id="momo-fields" class="payment-fields" style="display: none;">
+          <label for="momo-provider">MoMo Provider</label>
+          <select id="momo-provider" class="payment-input">
+            <option value="">-- Select Provider --</option>
+            <option value="MTN">MTN</option>
+            <option value="Vodafone">Vodafone</option>
+            <option value="AirtelTigo">AirtelTigo</option>
+          </select>
+          <label for="momo-number">MoMo Number</label>
+          <input type="tel" id="momo-number" class="payment-input" placeholder="e.g. 024 XXX XXXX">
+        </div>
+
+        <!-- Card Payment Fields (hidden by default) -->
+        <div id="card-fields" class="payment-fields" style="display: none;">
+          <p class="card-info">Card payment will be processed via POS terminal.</p>
+        </div>
+
+        <!-- Complete Sale Button -->
+        <button id="complete-sale-btn" class="btn btn-complete" disabled>
+          Complete Sale
+        </button>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- ════════════════════════════════════════════════════
+       RECEIPT MODAL
+       Pops up after a sale is completed.
+       Styled to look like a thermal receipt.
+  ════════════════════════════════════════════════════ -->
+  <!-- ════════════════════════════════════════════════════
+       MY SALES TODAY
+       What this cashier has taken today, for counting their
+       drawer at the end of a shift.
+  ════════════════════════════════════════════════════ -->
+  <div id="my-sales-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content my-sales-panel">
+      <div class="my-sales-header">
+        <h2>My Sales Today</h2>
+        <button class="modal-close" onclick="closeMySales()">&times;</button>
+      </div>
+
+      <div id="my-sales-body">
+        <p class="my-sales-loading">Loading...</p>
+      </div>
+
+      <div class="my-sales-actions">
+        <button class="btn btn-new-sale" onclick="closeMySales()">Back to Till</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="receipt-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content receipt-paper">
+
+      <!-- The receipt content (this part gets printed) -->
+      <div id="receipt-content">
+        <!-- Receipt HTML is generated by JavaScript -->
+      </div>
+
+      <!-- Modal action buttons (hidden when printing) -->
+      <div class="receipt-actions no-print">
+        <button id="print-receipt-btn" class="btn btn-print">Print Receipt</button>
+        <button id="new-sale-btn" class="btn btn-new-sale">New Sale</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+       TOAST NOTIFICATION CONTAINER
+       For showing success/error messages
+  ════════════════════════════════════════════════════ -->
+  <div id="notification-container" class="notification-container"></div>
+
+  <!-- ── Scripts (order matters: db first, then auth, then cashier) ── -->
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/shop.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/cashier.js"></script>
+  <script src="js/pwa.js"></script>
+
+</body>
+</html>

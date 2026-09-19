@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#006B3F"/>
+  <!-- Everything kept inside the safe zone so Android can crop it round -->
+  <path d="M160 196 L352 196 L326 344 L186 344 Z" fill="none" stroke="#FCD116" stroke-width="24" stroke-linejoin="round"/>
+  <path d="M208 196 L232 140" fill="none" stroke="#FCD116" stroke-width="24" stroke-linecap="round"/>
+  <path d="M304 196 L280 140" fill="none" stroke="#FCD116" stroke-width="24" stroke-linecap="round"/>
+  <rect x="212" y="288" width="88" height="16" rx="8" fill="#ffffff"/>
+</svg>

@@ -1,0 +1,338 @@
+/* ============================================================
+ * register.css - the shop sign-up page
+ * ============================================================
+ * Two columns on a laptop: the pitch on the left, the form on
+ * the right. On a phone the pitch collapses to a slim header so
+ * the form is the first thing you see.
+ * ============================================================ */
+
+.register-page {
+  background: var(--bg);
+  min-height: 100vh;
+}
+
+.register-shell {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  min-height: 100vh;
+}
+
+
+/* ── Left panel ─────────────────────────────────────────────── */
+.register-aside {
+  background: linear-gradient(160deg, var(--primary-dark) 0%, var(--primary) 100%);
+  color: var(--white);
+  padding: 48px 36px;
+  display: flex;
+  flex-direction: column;
+}
+
+.aside-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 48px;
+}
+
+.aside-logo { font-size: 28px; }
+
+.register-aside h1 {
+  font-size: 30px;
+  line-height: 1.25;
+  margin-bottom: 14px;
+}
+
+.aside-lead {
+  font-size: 15px;
+  opacity: 0.9;
+  margin-bottom: 32px;
+}
+
+.aside-points {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
+
+.aside-points li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.aside-points span { font-size: 20px; }
+
+.aside-footer {
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+
+/* ── Right panel ────────────────────────────────────────────── */
+.register-main {
+  padding: 48px 56px;
+  max-width: 640px;
+  width: 100%;
+}
+
+.register-main h2 {
+  font-size: 22px;
+  color: var(--gray-900);
+  margin-bottom: 6px;
+}
+
+.step-hint {
+  font-size: 14px;
+  color: var(--gray-500);
+  margin-bottom: 24px;
+}
+
+
+/* ── Step indicator ─────────────────────────────────────────── */
+.steps-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+
+.steps-bar .step {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-400);
+  padding-bottom: 10px;
+  border-bottom: 3px solid var(--gray-200);
+}
+
+.steps-bar .step span {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--gray-200);
+  color: var(--gray-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.steps-bar .step.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.steps-bar .step.active span {
+  background: var(--primary);
+  color: var(--white);
+}
+
+.steps-bar .step.done {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.steps-bar .step.done span {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+
+/* ── Form steps ─────────────────────────────────────────────── */
+.form-step { display: none; }
+.form-step.active { display: block; }
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.optional {
+  font-weight: 400;
+  color: var(--gray-400);
+  font-size: 12px;
+}
+
+.step-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.step-buttons .btn { flex: 1; }
+
+.btn-block { width: 100%; }
+
+
+/* ── Plan picker ────────────────────────────────────────────── */
+.plan-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.plan-option {
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all var(--transition);
+  background: var(--white);
+  display: block;
+}
+
+.plan-option:hover { border-color: var(--primary); }
+
+.plan-option.selected {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.plan-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.plan-name {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--gray-900);
+}
+
+.plan-price {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 17px;
+}
+
+.plan-price small {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gray-500);
+}
+
+.plan-meta {
+  font-size: 13px;
+  color: var(--gray-500);
+  margin-top: 4px;
+}
+
+.plan-trial {
+  font-size: 12px;
+  color: var(--primary);
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.login-link {
+  margin-top: 28px;
+  font-size: 14px;
+  color: var(--gray-500);
+  text-align: center;
+}
+
+
+/* ── Success overlay ────────────────────────────────────────── */
+.success-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 2000;
+}
+
+.success-overlay.show { display: flex; }
+
+.success-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 40px 32px;
+  max-width: 440px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+}
+
+.success-icon { font-size: 52px; margin-bottom: 12px; }
+
+.success-card h2 {
+  font-size: 22px;
+  margin-bottom: 8px;
+  color: var(--gray-900);
+}
+
+.success-card p {
+  color: var(--gray-500);
+  font-size: 15px;
+  margin-bottom: 24px;
+}
+
+.shop-id-box {
+  background: var(--primary-light);
+  border: 2px dashed var(--primary);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 24px;
+}
+
+.shop-id-box span {
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--gray-500);
+  margin-bottom: 6px;
+}
+
+.shop-id-box strong {
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary-dark);
+  letter-spacing: 1px;
+}
+
+.shop-id-box small {
+  display: block;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--gray-600);
+  line-height: 1.5;
+}
+
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .register-shell { grid-template-columns: 1fr; }
+
+  .register-aside {
+    padding: 24px;
+  }
+
+  .register-aside h1 { font-size: 22px; }
+  .aside-brand { margin-bottom: 20px; }
+  .aside-points, .aside-footer, .aside-lead { display: none; }
+
+  .register-main { padding: 28px 20px; }
+}
+
+@media (max-width: 520px) {
+  .form-row { grid-template-columns: 1fr; }
+  .steps-bar .step { font-size: 0; gap: 0; justify-content: center; }
+  .steps-bar .step span { font-size: 12px; }
+}

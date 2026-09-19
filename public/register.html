@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#006B3F">
+  <title>Register Your Shop - QuickMart POS</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/register.css">
+</head>
+<body class="register-page">
+
+  <div class="register-shell">
+
+    <!-- ── Left: what they're signing up for ── -->
+    <aside class="register-aside">
+      <div class="aside-brand">
+        <span class="aside-logo">&#128722;</span>
+        <span>QuickMart POS</span>
+      </div>
+
+      <h1>Run your shop from one screen.</h1>
+      <p class="aside-lead">
+        Sell, track stock, print receipts with your own shop name on them,
+        and see exactly what you made today.
+      </p>
+
+      <ul class="aside-points">
+        <li><span>&#128179;</span> Cash, Mobile Money and card at the till</li>
+        <li><span>&#129534;</span> Barcode scanning and instant lookup</li>
+        <li><span>&#128230;</span> Stock that updates itself with every sale</li>
+        <li><span>&#128200;</span> Daily sales and profit at a glance</li>
+        <li><span>&#128101;</span> Separate logins for your cashiers</li>
+      </ul>
+
+      <div class="aside-footer">
+        14 days free. No card needed to start.
+      </div>
+    </aside>
+
+    <!-- ── Right: the form ── -->
+    <main class="register-main">
+
+      <div class="steps-bar">
+        <div class="step active" data-step="1"><span>1</span> Your Shop</div>
+        <div class="step" data-step="2"><span>2</span> Contact</div>
+        <div class="step" data-step="3"><span>3</span> Your Login</div>
+      </div>
+
+      <div class="error-message" id="errorMessage"></div>
+
+      <form id="registerForm">
+
+        <!-- ── STEP 1 ── -->
+        <section class="form-step active" id="step-1">
+          <h2>Tell us about your shop</h2>
+          <p class="step-hint">This is the name that prints on every receipt.</p>
+
+          <div class="form-group">
+            <label for="shopName">Shop Name *</label>
+            <input type="text" id="shopName" placeholder="e.g. Bolga Fresh Mart" required>
+          </div>
+
+          <div class="form-group">
+            <label for="businessType">Business Type</label>
+            <select id="businessType">
+              <option>Supermarket</option>
+              <option>Provision Shop</option>
+              <option>Mini Mart</option>
+              <option>Pharmacy</option>
+              <option>Cosmetics Shop</option>
+              <option>Hardware Store</option>
+              <option>Boutique</option>
+              <option>Other Retail</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="planCode">Choose a Plan</label>
+            <div class="plan-options" id="planOptions">
+              <p class="text-muted">Loading plans...</p>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-primary btn-block" onclick="goToStep(2)">
+            Continue
+          </button>
+        </section>
+
+        <!-- ── STEP 2 ── -->
+        <section class="form-step" id="step-2">
+          <h2>Where can customers find you?</h2>
+          <p class="step-hint">This appears on your receipts. You can change it later.</p>
+
+          <div class="form-group">
+            <label for="phone">Shop Phone *</label>
+            <input type="tel" id="phone" placeholder="e.g. 024 123 4567" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="city">Town / City</label>
+              <input type="text" id="city" placeholder="e.g. Bolgatanga">
+            </div>
+            <div class="form-group">
+              <label for="region">Region</label>
+              <select id="region">
+                <option value="">Select region</option>
+                <option>Greater Accra</option>
+                <option>Ashanti</option>
+                <option>Upper East</option>
+                <option>Upper West</option>
+                <option>Northern</option>
+                <option>North East</option>
+                <option>Savannah</option>
+                <option>Bono</option>
+                <option>Bono East</option>
+                <option>Ahafo</option>
+                <option>Eastern</option>
+                <option>Central</option>
+                <option>Western</option>
+                <option>Western North</option>
+                <option>Volta</option>
+                <option>Oti</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="address">Street / Landmark</label>
+            <input type="text" id="address" placeholder="e.g. Near Bolga Central Market">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="digitalAddress">Ghana Post GPS</label>
+              <input type="text" id="digitalAddress" placeholder="e.g. UE-0044-4030">
+            </div>
+            <div class="form-group">
+              <label for="tin">TIN <span class="optional">(optional)</span></label>
+              <input type="text" id="tin" placeholder="Tax ID number">
+            </div>
+          </div>
+
+          <div class="step-buttons">
+            <button type="button" class="btn btn-secondary" onclick="goToStep(1)">Back</button>
+            <button type="button" class="btn btn-primary" onclick="goToStep(3)">Continue</button>
+          </div>
+        </section>
+
+        <!-- ── STEP 3 ── -->
+        <section class="form-step" id="step-3">
+          <h2>Create your owner login</h2>
+          <p class="step-hint">You'll use this to log in. Your staff get their own logins later.</p>
+
+          <div class="form-group">
+            <label for="ownerName">Your Full Name *</label>
+            <input type="text" id="ownerName" placeholder="e.g. Bushran Abdul-Rashid" required>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email Address *</label>
+            <input type="email" id="email" placeholder="you@yourshop.com" required>
+          </div>
+
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="e.g. bushran" autocomplete="off">
+            <small class="text-muted">Optional. You can log in with this instead of your email.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password *</label>
+            <div class="input-wrapper">
+              <input type="password" id="password" placeholder="At least 6 characters" required>
+              <button type="button" class="toggle-password" id="togglePassword">Show</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirm Password *</label>
+            <input type="password" id="confirmPassword" placeholder="Type it again" required>
+          </div>
+
+          <div class="step-buttons">
+            <button type="button" class="btn btn-secondary" onclick="goToStep(2)">Back</button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">Create My Shop</button>
+          </div>
+        </section>
+
+      </form>
+
+      <p class="login-link">
+        Already registered? <a href="index.html">Log in here</a>
+      </p>
+    </main>
+  </div>
+
+  <!-- ── Success screen ── -->
+  <div class="success-overlay" id="successOverlay">
+    <div class="success-card">
+      <div class="success-icon">&#127881;</div>
+      <h2 id="successTitle">Welcome!</h2>
+      <p id="successMessage"></p>
+
+      <div class="shop-id-box">
+        <span>Your Shop ID</span>
+        <strong id="successShopCode"></strong>
+        <small>Write this down. Your staff need it if they ever share an email address with another shop.</small>
+      </div>
+
+      <button class="btn btn-primary btn-block" onclick="window.location.href='admin.html'">
+        Go to My Dashboard
+      </button>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/register.js"></script>
+</body>
+</html>

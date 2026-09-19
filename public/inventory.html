@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#006B3F">
+  <title>Inventory Management - QuickMart Ghana</title>
+
+  <!-- Shared global styles -->
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Page-specific styles -->
+  <link rel="stylesheet" href="css/inventory.css">
+</head>
+<body>
+
+  <!-- ============================================================
+       SIDEBAR NAVIGATION
+       - Brand logo at top
+       - Tab-switching nav links (not separate pages)
+       - User info and logout at the bottom
+       ============================================================ -->
+  <aside class="sidebar" id="sidebar">
+
+    <!-- Brand -->
+    <div class="sidebar-brand">
+      <h2>QuickMart Ghana</h2>
+    </div>
+
+    <!-- Navigation links - each one switches a tab in the main area -->
+    <nav class="sidebar-nav">
+      <ul>
+        <li>
+          <a href="#" class="nav-link active" data-tab="overview" onclick="switchTab('overview')">
+            <span class="nav-icon">&#128202;</span>  <!-- bar chart icon -->
+            Overview
+          </a>
+        </li>
+        <li>
+          <a href="#" class="nav-link" data-tab="stock-levels" onclick="switchTab('stock-levels')">
+            <span class="nav-icon">&#128230;</span>  <!-- package icon -->
+            Stock Levels
+          </a>
+        </li>
+        <li>
+          <a href="#" class="nav-link" data-tab="stock-movements" onclick="switchTab('stock-movements')">
+            <span class="nav-icon">&#128259;</span>  <!-- arrows icon -->
+            Stock Movements
+          </a>
+        </li>
+        <li>
+          <a href="#" class="nav-link" data-tab="alerts" onclick="switchTab('alerts')">
+            <span class="nav-icon">&#128276;</span>  <!-- bell icon -->
+            Alerts
+            <!-- Badge that shows count of alerts (low + out of stock) -->
+            <span class="alert-badge" id="alertBadge" style="display:none;">0</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- User info shown at the bottom of the sidebar -->
+    <div class="sidebar-user">
+      <div class="user-info">
+        <p class="user-name" id="sidebarUserName">Loading...</p>
+        <p class="user-role" id="sidebarUserRole">---</p>
+      </div>
+      <button class="logout-btn" onclick="Auth.logout()">Logout</button>
+    </div>
+  </aside>
+
+
+  <!-- ============================================================
+       MAIN CONTENT AREA
+       - Top header bar with page title and welcome message
+       - Tab sections that show/hide based on sidebar selection
+       ============================================================ -->
+  <main class="main-content">
+
+    <!-- Top Header Bar -->
+    <header class="top-header">
+      <div class="header-left">
+        <!-- Hamburger button for mobile sidebar toggle -->
+        <button class="menu-toggle" id="menuToggle" onclick="toggleSidebar()">&#9776;</button>
+        <h1>Inventory Management</h1>
+      </div>
+      <div class="header-right">
+        <p>Welcome, <span id="headerUserName">User</span></p>
+      </div>
+    </header>
+
+
+    <!-- ==========================================================
+         TAB 1: OVERVIEW
+         - Stat cards (total, in stock, low stock, out of stock)
+         - Total inventory value
+         - Category distribution chart
+         - Recent stock movements
+         ========================================================== -->
+    <section class="tab-content active" id="tab-overview">
+
+      <!-- Row of 4 stat cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3>Total Products</h3>
+          <p class="stat-number" id="totalProducts">0</p>
+        </div>
+        <div class="stat-card stat-green">
+          <h3>In Stock</h3>
+          <p class="stat-number" id="inStockCount">0</p>
+        </div>
+        <div class="stat-card stat-orange">
+          <h3>Low Stock</h3>
+          <p class="stat-number" id="lowStockCount">0</p>
+        </div>
+        <div class="stat-card stat-red">
+          <h3>Out of Stock</h3>
+          <p class="stat-number" id="outOfStockCount">0</p>
+        </div>
+      </div>
+
+      <!-- Total Inventory Value -->
+      <div class="inventory-value-card">
+        <h3>Total Inventory Value</h3>
+        <p class="value-amount" id="inventoryValue">GH&#8373; 0.00</p>
+      </div>
+
+      <!-- Stock Distribution by Category (horizontal bar chart) -->
+      <div class="card">
+        <h3>Stock Distribution by Category</h3>
+        <div class="category-chart" id="categoryChart">
+          <!-- Bars are rendered by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Recent Stock Movements (last 10) -->
+      <div class="card">
+        <h3>Recent Stock Movements</h3>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Product</th>
+                <th>Type</th>
+                <th>Quantity</th>
+                <th>Performed By</th>
+              </tr>
+            </thead>
+            <tbody id="recentMovementsBody">
+              <!-- Filled by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ==========================================================
+         TAB 2: STOCK LEVELS
+         - Search bar + category filter + status filter buttons
+         - Stock table with adjust actions
+         - Export to CSV button
+         ========================================================== -->
+    <section class="tab-content" id="tab-stock-levels">
+
+      <!-- Add Product button row -->
+      <div class="add-product-row">
+        <button class="btn btn-primary" onclick="openAddProductModal()">
+          &#43; Add Product
+        </button>
+      </div>
+
+      <!-- Filters row -->
+      <div class="filters-row">
+        <!-- Text search -->
+        <input
+          type="text"
+          class="search-input"
+          id="stockSearch"
+          placeholder="Search by product name or barcode..."
+          oninput="searchStock(this.value)"
+        >
+
+        <!-- Category dropdown -->
+        <select class="filter-select" id="categoryFilter" onchange="filterByCategory(this.value)">
+          <option value="all">All Categories</option>
+          <!-- Options populated by JavaScript -->
+        </select>
+
+        <!-- Status filter buttons -->
+        <div class="status-filters">
+          <button class="filter-btn active" data-status="all" onclick="filterByStatus('all')">All</button>
+          <button class="filter-btn" data-status="in-stock" onclick="filterByStatus('in-stock')">In Stock</button>
+          <button class="filter-btn" data-status="low-stock" onclick="filterByStatus('low-stock')">Low Stock</button>
+          <button class="filter-btn" data-status="out-of-stock" onclick="filterByStatus('out-of-stock')">Out of Stock</button>
+        </div>
+      </div>
+
+      <!-- Stock levels table -->
+      <div class="table-wrapper">
+        <table class="data-table" id="stockTable">
+          <thead>
+            <tr>
+              <th>Barcode</th>
+              <th>Product Name</th>
+              <th>Category</th>
+              <th>Price (GH&#8373;)</th>
+              <th>Current Stock</th>
+              <th>Min Stock</th>
+              <th>Unit</th>
+              <th>Status</th>
+              <th>Stock Level</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="stockLevelsBody">
+            <!-- Filled by JavaScript -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Export button -->
+      <div class="export-row">
+        <button class="btn btn-secondary" onclick="exportStockLevelsCSV()">
+          &#128190; Export to CSV
+        </button>
+      </div>
+    </section>
+
+
+    <!-- ==========================================================
+         TAB 3: STOCK MOVEMENTS
+         - Date range filters + type filter
+         - Movements table
+         - Export to CSV button
+         ========================================================== -->
+    <section class="tab-content" id="tab-stock-movements">
+
+      <!-- Filters row -->
+      <div class="filters-row">
+        <div class="date-filters">
+          <label>From:
+            <input type="date" id="moveDateFrom" onchange="applyMovementFilters()">
+          </label>
+          <label>To:
+            <input type="date" id="moveDateTo" onchange="applyMovementFilters()">
+          </label>
+        </div>
+
+        <!-- Type filter -->
+        <select class="filter-select" id="moveTypeFilter" onchange="applyMovementFilters()">
+          <option value="all">All Types</option>
+          <option value="in">Stock In</option>
+          <option value="out">Stock Out</option>
+        </select>
+      </div>
+
+      <!-- Movements table -->
+      <div class="table-wrapper">
+        <table class="data-table" id="movementsTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Product</th>
+              <th>Type</th>
+              <th>Quantity</th>
+              <th>Previous Stock</th>
+              <th>New Stock</th>
+              <th>Reason</th>
+              <th>Performed By</th>
+            </tr>
+          </thead>
+          <tbody id="movementsBody">
+            <!-- Filled by JavaScript -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Export button -->
+      <div class="export-row">
+        <button class="btn btn-secondary" onclick="exportMovementsCSV()">
+          &#128190; Export to CSV
+        </button>
+      </div>
+    </section>
+
+
+    <!-- ==========================================================
+         TAB 4: ALERTS
+         - Low stock alerts (stock <= minStock but > 0)
+         - Out of stock alerts (stock === 0)
+         - Each has a "Restock Now" button
+         ========================================================== -->
+    <section class="tab-content" id="tab-alerts">
+
+      <!-- Low Stock Alerts -->
+      <div class="alerts-section">
+        <h2 class="section-title">
+          &#9888; Low Stock Alerts
+          <span class="badge badge-orange" id="lowStockBadge">0</span>
+        </h2>
+        <div class="alerts-grid" id="lowStockAlerts">
+          <!-- Filled by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Out of Stock Alerts -->
+      <div class="alerts-section">
+        <h2 class="section-title">
+          &#10060; Out of Stock
+          <span class="badge badge-red" id="outOfStockBadge">0</span>
+        </h2>
+        <div class="alerts-grid" id="outOfStockAlerts">
+          <!-- Filled by JavaScript -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- ============================================================
+       STOCK ADJUSTMENT MODAL
+       - Opens when "Adjust Stock" or "Restock Now" is clicked
+       - Lets the user add or remove stock with a reason
+       ============================================================ -->
+  <div class="modal-overlay" id="adjustModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Adjust Stock</h2>
+        <button class="modal-close" onclick="closeAdjustModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- Product name (read-only) -->
+        <div class="form-group">
+          <label>Product</label>
+          <input type="text" id="modalProductName" readonly class="form-input readonly">
+        </div>
+
+        <!-- Current stock (read-only) -->
+        <div class="form-group">
+          <label>Current Stock</label>
+          <input type="text" id="modalCurrentStock" readonly class="form-input readonly">
+        </div>
+
+        <!-- Adjustment type: add or remove -->
+        <div class="form-group">
+          <label for="adjustType">Adjustment Type</label>
+          <select id="adjustType" class="form-input">
+            <option value="in">Add Stock</option>
+            <option value="out">Remove Stock</option>
+          </select>
+        </div>
+
+        <!-- Quantity to add/remove -->
+        <div class="form-group">
+          <label for="adjustQuantity">Quantity</label>
+          <input type="number" id="adjustQuantity" min="1" class="form-input" placeholder="Enter quantity">
+        </div>
+
+        <!-- Reason for the adjustment -->
+        <div class="form-group">
+          <label for="adjustReason">Reason</label>
+          <input type="text" id="adjustReason" class="form-input" placeholder="e.g. Supplier delivery, Damaged items">
+        </div>
+
+        <!-- Error message area -->
+        <p class="modal-error" id="modalError" style="display:none;"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeAdjustModal()">Cancel</button>
+        <button class="btn btn-primary" id="applyAdjustBtn" onclick="handleAdjustSubmit()">
+          Apply Adjustment
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       ADD PRODUCT MODAL
+       - Opens when "+ Add Product" is clicked
+       - Lets the inventory manager create a new product
+       ============================================================ -->
+  <div class="modal-overlay" id="addProductModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Add New Product</h2>
+        <button class="modal-close" onclick="closeAddProductModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+
+        <div class="form-group">
+          <label for="newProductName">Product Name *</label>
+          <input type="text" id="newProductName" class="form-input" placeholder="e.g. Milo 400g Tin">
+        </div>
+
+        <div class="form-group">
+          <label for="newProductCategory">Category</label>
+          <!-- Filled from this shop's own categories by refreshCategoryDropdowns() -->
+          <select id="newProductCategory" class="form-input">
+            <option value="">&#8212; No category &#8212;</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="newProductPrice">Price (GH&#8373;) *</label>
+            <input type="number" id="newProductPrice" class="form-input" min="0" step="0.01" placeholder="0.00">
+          </div>
+          <div class="form-group">
+            <label for="newProductUnit">Unit *</label>
+            <input type="text" id="newProductUnit" class="form-input" placeholder="e.g. pcs, kg, litre">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="newProductStock">Initial Stock *</label>
+            <input type="number" id="newProductStock" class="form-input" min="0" placeholder="0">
+          </div>
+          <div class="form-group">
+            <label for="newProductMinStock">Min Stock Level *</label>
+            <input type="number" id="newProductMinStock" class="form-input" min="0" placeholder="5">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="newProductBarcode">Barcode</label>
+          <div class="barcode-input-row">
+            <input type="text" id="newProductBarcode" class="form-input" placeholder="Leave blank to auto-generate">
+            <button class="btn btn-secondary btn-sm" type="button" onclick="autoGenerateBarcode()">
+              Auto Generate
+            </button>
+          </div>
+        </div>
+
+        <p class="modal-error" id="addProductError" style="display:none;"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeAddProductModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="handleAddProductSubmit()">
+          Save Product
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       NOTIFICATION TOAST
+       - Shows brief success/error messages at the top of the page
+       ============================================================ -->
+  <div class="notification" id="notification" style="display:none;">
+    <p id="notificationMessage"></p>
+  </div>
+
+
+  <!-- ============================================================
+       SCRIPTS
+       - db.js  : localStorage database layer
+       - auth.js: authentication & session management
+       - inventory.js: all the logic for this page
+       ============================================================ -->
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/shop.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/inventory.js"></script>
+  <script src="js/pwa.js"></script>
+
+</body>
+</html>

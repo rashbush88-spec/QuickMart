@@ -1,0 +1,398 @@
+/* ============================================================
+ * style.css - Main Styles for QuickMart Ghana
+ * ============================================================
+ * This stylesheet covers the login page and shared base styles.
+ * Colours are inspired by the Ghanaian flag: red, gold, green.
+ * ============================================================ */
+
+/* ── CSS Variables (Design Tokens) ─────────────────────────── */
+:root {
+  /* Ghana flag colours */
+  --gh-red:    #CE1126;
+  --gh-gold:   #FCD116;
+  --gh-green:  #006B3F;
+
+  /* App palette */
+  --primary:       #006B3F;   /* green  */
+  --primary-light: #e8f5e9;
+  --primary-dark:  #004d2c;
+  --accent:        #FCD116;   /* gold   */
+  --danger:        #CE1126;   /* red    */
+  --danger-light:  #fce4e7;
+
+  /* Neutrals */
+  --bg:         #f0f2f5;
+  --white:      #ffffff;
+  --gray-50:    #f9fafb;
+  --gray-100:   #f3f4f6;
+  --gray-200:   #e5e7eb;
+  --gray-300:   #d1d5db;
+  --gray-400:   #9ca3af;
+  --gray-500:   #6b7280;
+  --gray-600:   #4b5563;
+  --gray-700:   #374151;
+  --gray-800:   #1f2937;
+  --gray-900:   #111827;
+
+  /* Misc */
+  --shadow:     0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg:  0 4px 16px rgba(0, 0, 0, 0.15);
+  --radius:     8px;
+  --radius-lg:  12px;
+  --transition: 0.2s ease;
+}
+
+
+/* ── Reset & Base ──────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg);
+  color: var(--gray-800);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+
+/* ── Login Page Layout ─────────────────────────────────────── */
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+}
+
+
+/* ── Login Card ────────────────────────────────────────────── */
+.login-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 440px;
+  overflow: hidden;           /* so the flag stripe stays inside rounded corners */
+}
+
+/* Ghana flag stripe at the very top of the card */
+.flag-stripe {
+  display: flex;
+  height: 6px;
+}
+.flag-stripe .red   { flex: 1; background: var(--gh-red);   }
+.flag-stripe .gold  { flex: 1; background: var(--gh-gold);  }
+.flag-stripe .green { flex: 1; background: var(--gh-green); }
+
+/* Card inner padding */
+.login-card-body {
+  padding: 40px 36px 32px;
+}
+
+
+/* ── Logo / Brand ──────────────────────────────────────────── */
+.brand {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.brand-logo {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+
+.brand-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.brand-subtitle {
+  font-size: 14px;
+  color: var(--gray-500);
+  margin-top: 4px;
+}
+
+
+/* ── Form Elements ─────────────────────────────────────────── */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-700);
+  margin-bottom: 6px;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-wrapper input,
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius);
+  font-size: 15px;
+  color: var(--gray-800);
+  background: var(--white);
+  transition: border-color var(--transition);
+  outline: none;
+}
+
+.input-wrapper input:focus,
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--primary);
+}
+
+/* Password show/hide toggle */
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--gray-400);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.toggle-password:hover {
+  color: var(--gray-600);
+}
+
+
+/* ── Buttons ───────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--white);
+  width: 100%;
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+}
+
+.btn-secondary {
+  background: var(--gray-100);
+  color: var(--gray-700);
+  border: 1px solid var(--gray-200);
+}
+
+.btn-secondary:hover {
+  background: var(--gray-200);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: var(--white);
+}
+
+.btn-danger:hover {
+  background: #a50e1f;
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 13px;
+}
+
+.btn-icon {
+  padding: 8px;
+  min-width: 36px;
+  min-height: 36px;
+}
+
+
+/* ── Error Message ─────────────────────────────────────────── */
+.error-message {
+  background: var(--danger-light);
+  color: var(--danger);
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  margin-bottom: 20px;
+  display: none;               /* hidden by default, shown via JS */
+  text-align: center;
+}
+
+.error-message.show {
+  display: block;
+}
+
+
+/* ── Demo Credentials Section ──────────────────────────────── */
+.demo-section {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--gray-200);
+}
+
+.demo-section h3 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--gray-400);
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.demo-cards {
+  display: flex;
+  gap: 10px;
+}
+
+.demo-card {
+  flex: 1;
+  padding: 12px 10px;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition);
+  background: var(--gray-50);
+}
+
+.demo-card:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.demo-card .role-icon {
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+
+.demo-card .role-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gray-800);
+  text-transform: capitalize;
+}
+
+.demo-card .role-email {
+  font-size: 11px;
+  color: var(--gray-500);
+  margin-top: 2px;
+  word-break: break-all;
+}
+
+.demo-card .role-pass {
+  font-size: 11px;
+  color: var(--gray-400);
+  margin-top: 2px;
+}
+
+
+/* ── Notification Toast ────────────────────────────────────── */
+.notification-toast {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  padding: 14px 24px;
+  border-radius: var(--radius);
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 9999;
+  box-shadow: var(--shadow-lg);
+  transform: translateX(120%);
+  transition: transform 0.3s ease;
+}
+
+.notification-toast.show {
+  transform: translateX(0);
+}
+
+.notification-toast.success {
+  background: var(--primary);
+}
+
+.notification-toast.error {
+  background: var(--danger);
+}
+
+.notification-toast.warning {
+  background: #f59e0b;
+}
+
+.notification-toast.info {
+  background: #3b82f6;
+}
+
+
+/* ── Utility Classes ───────────────────────────────────────── */
+.text-center  { text-align: center;  }
+.text-right   { text-align: right;   }
+.text-muted   { color: var(--gray-500); }
+.text-success { color: var(--primary);  }
+.text-danger  { color: var(--danger);   }
+
+.mt-1 { margin-top: 4px;   }
+.mt-2 { margin-top: 8px;   }
+.mt-3 { margin-top: 16px;  }
+.mt-4 { margin-top: 24px;  }
+.mb-1 { margin-bottom: 4px;  }
+.mb-2 { margin-bottom: 8px;  }
+.mb-3 { margin-bottom: 16px; }
+.mb-4 { margin-bottom: 24px; }
+
+
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .login-card-body {
+    padding: 28px 20px 24px;
+  }
+
+  .demo-cards {
+    flex-direction: column;
+  }
+
+  .brand-name {
+    font-size: 20px;
+  }
+}

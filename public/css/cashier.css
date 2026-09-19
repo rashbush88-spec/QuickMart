@@ -1,0 +1,1208 @@
+/**
+ * ============================================================
+ * cashier.css - Point of Sale (POS) Page Styles
+ * ============================================================
+ * This stylesheet controls the layout and appearance of the
+ * cashier POS page. It's split into clear sections:
+ *
+ *   1. General / Reset
+ *   2. Top Navigation Bar
+ *   3. Main POS Layout (left/right split)
+ *   4. Product Panel (left side)
+ *   5. Cart Panel (right side)
+ *   6. Payment Section
+ *   7. Receipt Modal
+ *   8. Notifications (toast messages)
+ *   9. Print Styles (receipt-only printing)
+ * ============================================================
+ */
+
+
+/* ─────────────────────────────────────────────────────────────
+   1. GENERAL / RESET
+   ───────────────────────────────────────────────────────────── */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f0f2f5;
+  color: #333;
+  min-height: 100vh;
+}
+
+/* Reusable button base */
+.btn {
+  border: none;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.2s, opacity 0.2s;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   2. TOP NAVIGATION BAR
+   ───────────────────────────────────────────────────────────── */
+
+.pos-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #1a5632;         /* Dark green - Ghanaian themed */
+  color: white;
+  padding: 10px 24px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.nav-brand h1 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.nav-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 14px;
+}
+
+.btn-logout {
+  background-color: #c0392b;
+  color: white;
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
+.btn-logout:hover {
+  background-color: #a93226;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   3. MAIN POS LAYOUT
+   Two-column split: products (left 60%) and cart (right 40%).
+   On small screens it stacks vertically.
+   ───────────────────────────────────────────────────────────── */
+
+.pos-container {
+  display: flex;
+  height: calc(100vh - 52px);        /* Full height minus navbar */
+  overflow: hidden;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   4. PRODUCT PANEL (LEFT SIDE - 60%)
+   Contains search bar, category pills, and product grid.
+   ───────────────────────────────────────────────────────────── */
+
+.products-panel {
+  flex: 0 0 60%;                     /* Fixed at 60% width */
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  overflow-y: auto;                  /* Scroll if products overflow */
+  background-color: #f0f2f5;
+}
+
+/* -- Search Bar -- */
+.search-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.search-input {
+  flex: 1;                           /* Take up remaining space */
+  padding: 10px 14px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  border-color: #1a5632;
+}
+
+.barcode-input {
+  width: 200px;
+  padding: 10px 14px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  background-color: #fffde7;        /* Light yellow to distinguish it */
+  transition: border-color 0.2s;
+}
+
+.barcode-input:focus {
+  border-color: #f39c12;
+}
+
+/* -- Barcode Scanner Bar -- */
+.barcode-scanner-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fffde7;
+  border: 2px solid #f39c12;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+}
+
+.scan-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.barcode-input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #f39c12;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: 'Courier New', monospace;
+  background: white;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.barcode-input:focus {
+  border-color: #d68910;
+  box-shadow: 0 0 0 2px rgba(243, 156, 18, 0.2);
+}
+
+.btn-scan-lookup {
+  background-color: #f39c12;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-scan-lookup:hover {
+  background-color: #d68910;
+}
+
+/* -- Scan Result Preview -- */
+.scan-result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #eafaf1;
+  border: 2px solid #27ae60;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.scan-result-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.scan-result-code {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #888;
+  background: #f0f0f0;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.scan-result-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a5632;
+}
+
+.scan-result-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: #27ae60;
+}
+
+.btn-add-scanned {
+  background-color: #27ae60;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-add-scanned:hover {
+  background-color: #219a52;
+}
+
+
+/* -- Category Filter Pills -- */
+.category-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 2px solid #ddd;
+  border-radius: 20px;              /* Rounded pill shape */
+  background-color: white;
+  color: #555;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+/* The category's own picture, when the shop uploaded one */
+.pill-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-left: -4px;                /* Sit snugly inside the pill */
+  background-color: #f0f0f0;
+}
+
+.pill:hover {
+  border-color: #1a5632;
+  color: #1a5632;
+}
+
+/* Active pill = currently selected category */
+.pill.active {
+  background-color: #1a5632;
+  color: white;
+  border-color: #1a5632;
+}
+
+/* -- Product Grid -- */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  padding-bottom: 16px;
+}
+
+/* Individual product card */
+.product-card {
+  background: white;
+  border: 2px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.product-card:hover {
+  border-color: #1a5632;
+  box-shadow: 0 3px 10px rgba(26, 86, 50, 0.12);
+  transform: translateY(-2px);
+}
+
+.product-card .product-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  line-height: 1.3;
+}
+
+.product-card .product-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a5632;
+}
+
+.product-card .product-stock {
+  font-size: 12px;
+  color: #777;
+}
+
+/* Low stock warning */
+.product-card .product-stock.low-stock {
+  color: #e67e22;
+  font-weight: 600;
+}
+
+.product-card .btn-add {
+  margin-top: auto;                  /* Push to bottom of card */
+  background-color: #27ae60;
+  color: white;
+  text-align: center;
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 13px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.product-card .btn-add:hover {
+  background-color: #219a52;
+}
+
+/* -- Product barcode label on card -- */
+.product-card .product-code {
+  font-size: 11px;
+  color: #aaa;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.5px;
+}
+
+/* -- Out of Stock Overlay -- */
+.product-card.out-of-stock {
+  opacity: 0.55;
+  pointer-events: none;             /* Can't click it */
+  cursor: default;
+}
+
+.product-card.out-of-stock .out-of-stock-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-15deg);
+  background: rgba(231, 76, 60, 0.9);
+  color: white;
+  padding: 4px 14px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   5. CART PANEL (RIGHT SIDE - 40%)
+   Contains cart header, items list, summary, and payment.
+   ───────────────────────────────────────────────────────────── */
+
+.cart-panel {
+  flex: 0 0 40%;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  border-left: 2px solid #e0e0e0;
+  overflow: hidden;
+}
+
+/* -- Cart Header -- */
+.cart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background-color: #fafafa;
+  border-bottom: 2px solid #e8e8e8;
+}
+
+.cart-header h2 {
+  font-size: 18px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Item count badge */
+.cart-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e74c3c;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.btn-clear {
+  background-color: #e8e8e8;
+  color: #555;
+  font-size: 12px;
+  padding: 5px 12px;
+}
+
+.btn-clear:hover {
+  background-color: #ddd;
+}
+
+/* -- Cart Items List -- */
+.cart-items {
+  flex: 1;                           /* Take available space */
+  overflow-y: auto;                  /* Scroll if many items */
+  padding: 12px 18px;
+}
+
+.empty-cart-msg {
+  text-align: center;
+  color: #aaa;
+  font-size: 14px;
+  padding: 40px 0;
+}
+
+/* Single cart item row */
+.cart-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+  gap: 10px;
+}
+
+.cart-item:last-child {
+  border-bottom: none;
+}
+
+.cart-item-info {
+  flex: 1;
+}
+
+.cart-item-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+.cart-item-price {
+  font-size: 12px;
+  color: #777;
+}
+
+/* Quantity controls: [ - ] qty [ + ] */
+.qty-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.qty-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #f5f5f5;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+  color: #333;
+}
+
+.qty-btn:hover {
+  background: #e0e0e0;
+}
+
+.qty-value {
+  width: 32px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* Item subtotal */
+.cart-item-subtotal {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a5632;
+  min-width: 70px;
+  text-align: right;
+}
+
+/* Remove button (X) */
+.btn-remove {
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: #fee;
+  color: #e74c3c;
+  border-radius: 50%;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.btn-remove:hover {
+  background: #fdd;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   5b. CART SUMMARY
+   Shows subtotal, tax, and total.
+   ───────────────────────────────────────────────────────────── */
+
+.cart-summary {
+  padding: 12px 18px;
+  border-top: 2px solid #e8e8e8;
+  background-color: #fafafa;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.total-row {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a5632;
+  padding-top: 8px;
+  border-top: 2px dashed #ddd;
+  margin-top: 6px;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   6. PAYMENT SECTION
+   Payment method buttons, input fields, and Complete button.
+   ───────────────────────────────────────────────────────────── */
+
+.payment-section {
+  padding: 14px 18px;
+  border-top: 2px solid #e8e8e8;
+  background-color: #f8faf8;
+}
+
+.payment-section h3 {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+/* Payment method toggle buttons */
+.payment-methods {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.pay-method-btn {
+  flex: 1;
+  padding: 8px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pay-method-btn:hover {
+  border-color: #1a5632;
+  color: #1a5632;
+}
+
+.pay-method-btn.active {
+  background-color: #1a5632;
+  color: white;
+  border-color: #1a5632;
+}
+
+/* Payment input fields */
+.payment-fields {
+  margin-bottom: 10px;
+}
+
+.payment-fields label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 4px;
+  margin-top: 8px;
+}
+
+.payment-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.payment-input:focus {
+  border-color: #1a5632;
+}
+
+.change-display {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #e8f5e9;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #1a5632;
+}
+
+.card-info {
+  padding: 10px;
+  background: #e3f2fd;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #1565c0;
+  text-align: center;
+}
+
+/* Complete Sale Button */
+.btn-complete {
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  background-color: #f39c12;
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-complete:hover:not(:disabled) {
+  background-color: #e67e22;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   7. RECEIPT MODAL
+   An overlay that shows a thermal-receipt-style printout.
+   ───────────────────────────────────────────────────────────── */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);   /* Dimmed background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Receipt paper look */
+.receipt-paper {
+  background: white;
+  width: 320px;
+  padding: 24px 20px;
+  border-radius: 4px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  color: #333;
+}
+
+/* Receipt header (store name, address) */
+.receipt-header {
+  text-align: center;
+  border-bottom: 2px dashed #999;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+
+.receipt-header .store-name {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.receipt-header .store-address,
+.receipt-header .store-phone {
+  font-size: 11px;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* Receipt meta (receipt no, date, cashier) */
+.receipt-meta {
+  border-bottom: 1px dashed #999;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+/* Receipt items table */
+.receipt-items {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 8px;
+}
+
+.receipt-items th {
+  text-align: left;
+  font-size: 11px;
+  border-bottom: 1px solid #999;
+  padding: 4px 0;
+}
+
+.receipt-items th:last-child {
+  text-align: right;
+}
+
+.receipt-items td {
+  padding: 3px 0;
+  font-size: 11px;
+  vertical-align: top;
+}
+
+.receipt-items td:last-child {
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Receipt totals section */
+.receipt-totals {
+  border-top: 1px dashed #999;
+  padding-top: 8px;
+  margin-bottom: 8px;
+}
+
+.receipt-totals .receipt-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+  font-size: 12px;
+}
+
+.receipt-totals .receipt-row.grand-total {
+  font-size: 16px;
+  font-weight: 700;
+  border-top: 2px dashed #999;
+  border-bottom: 2px dashed #999;
+  padding: 6px 0;
+  margin: 4px 0;
+}
+
+/* Receipt payment info */
+.receipt-payment {
+  border-top: 1px dashed #999;
+  padding-top: 8px;
+  margin-bottom: 10px;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+/* Receipt footer */
+.receipt-footer {
+  text-align: center;
+  border-top: 2px dashed #999;
+  padding-top: 10px;
+  font-size: 11px;
+  color: #666;
+  line-height: 1.6;
+}
+
+.receipt-footer .thank-you {
+  font-weight: 700;
+  font-size: 12px;
+  color: #333;
+}
+
+/* Receipt action buttons (Print / New Sale) */
+.receipt-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.btn-print {
+  flex: 1;
+  background-color: #2980b9;
+  color: white;
+  padding: 10px;
+  font-size: 14px;
+}
+
+.btn-print:hover {
+  background-color: #2471a3;
+}
+
+.btn-new-sale {
+  flex: 1;
+  background-color: #27ae60;
+  color: white;
+  padding: 10px;
+  font-size: 14px;
+}
+
+.btn-new-sale:hover {
+  background-color: #219a52;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   8. NOTIFICATIONS (Toast Messages)
+   Small pop-up messages for success, error, and info events.
+   ───────────────────────────────────────────────────────────── */
+
+.notification-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast {
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  animation: slideIn 0.3s ease-out;
+  max-width: 320px;
+}
+
+/* Toast colour variants */
+.toast.success {
+  background-color: #27ae60;
+}
+
+.toast.error {
+  background-color: #e74c3c;
+}
+
+.toast.info {
+  background-color: #2980b9;
+}
+
+/* Slide-in animation for toasts */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Fade-out animation for toasts */
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+.toast.fade-out {
+  animation: fadeOut 0.3s ease-in forwards;
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   9. PRINT STYLES
+   When the user clicks "Print Receipt", only the receipt
+   content is shown. Everything else is hidden.
+   ───────────────────────────────────────────────────────────── */
+
+@media print {
+  /* Hide everything except the receipt */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Show the receipt modal and its contents */
+  #receipt-modal,
+  #receipt-modal * {
+    visibility: visible;
+  }
+
+  /* Remove the dimmed overlay background */
+  #receipt-modal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: white;
+  }
+
+  .modal-content {
+    box-shadow: none;
+    margin: 0 auto;
+  }
+
+  /* Hide the Print / New Sale buttons during printing */
+  .no-print {
+    display: none !important;
+  }
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   10. RESPONSIVE ADJUSTMENTS
+   Stack the panels vertically on smaller screens.
+   ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .pos-container {
+    flex-direction: column;
+    height: auto;
+    overflow: auto;
+  }
+
+  .products-panel,
+  .cart-panel {
+    flex: none;
+    width: 100%;
+  }
+
+  .cart-panel {
+    border-left: none;
+    border-top: 2px solid #e0e0e0;
+    min-height: 60vh;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+
+  .search-bar {
+    flex-direction: column;
+  }
+
+  .barcode-scanner-bar {
+    flex-wrap: wrap;
+  }
+
+  .barcode-input {
+    min-width: 0;
+  }
+}
+
+
+/* ============================================================
+ * Added in v2 - receipt bits that are now shop-specific
+ * ============================================================ */
+
+/* The shop's slogan, printed under its name */
+.receipt-header .store-slogan {
+  font-size: 11px;
+  font-style: italic;
+  color: #444;
+  margin-bottom: 2px;
+}
+
+/* One line of the totals block: label on the left, amount right */
+.receipt-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  padding: 2px 0;
+}
+
+.receipt-line.receipt-total {
+  font-size: 15px;
+  font-weight: 700;
+  border-top: 1px dashed #000;
+  margin-top: 6px;
+  padding-top: 6px;
+}
+
+/* The shop ID printed at the very bottom */
+.receipt-code {
+  margin-top: 6px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #666;
+}
+
+/* ════════════════════════════════════════════════════
+   MY SALES TODAY
+   The cashier's own figures, for counting the drawer.
+   ════════════════════════════════════════════════════ */
+
+.btn-my-sales {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  margin-right: 10px;
+}
+
+.btn-my-sales:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.my-sales-panel {
+  /* .modal-content carries no background of its own - the receipt
+     supplies its own paper look - so this panel brings its own. */
+  background: #fff;
+  color: var(--gray-800, #222);
+  max-width: 560px;
+  width: 92%;
+  max-height: 86vh;
+  overflow-y: auto;
+  padding: 0;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+.my-sales-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.my-sales-header h2 {
+  margin: 0;
+  font-size: 19px;
+}
+
+.my-sales-loading,
+.my-sales-error {
+  padding: 28px 22px;
+  text-align: center;
+  color: var(--gray-500);
+}
+
+.my-sales-error { color: var(--danger, #c0392b); }
+
+.my-sales-summary { padding: 20px 22px 6px; }
+
+.my-sales-total {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 16px;
+  border-radius: 10px;
+  background: var(--primary, #006B3F);
+  color: #fff;
+}
+
+.my-sales-total .label { font-size: 13px; opacity: 0.85; }
+.my-sales-total .value { font-size: 30px; font-weight: 700; }
+.my-sales-total .count { font-size: 13px; opacity: 0.85; }
+
+.my-sales-split { margin-top: 14px; }
+
+.split-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 9px 4px;
+  border-bottom: 1px dashed var(--gray-200);
+  font-size: 14px;
+}
+
+/* The one figure they physically count */
+.split-row.cash {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--primary, #006B3F);
+}
+
+.my-sales-voided {
+  margin: 10px 22px 0;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #fdf3e7;
+  color: #8a5a20;
+  font-size: 13px;
+}
+
+.my-sales-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0 0;
+  font-size: 14px;
+}
+
+.my-sales-table th,
+.my-sales-table td {
+  padding: 9px 22px;
+  text-align: left;
+  border-bottom: 1px solid var(--gray-100, #f1f1f1);
+}
+
+.my-sales-table th {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--gray-500);
+  background: var(--gray-50, #fafafa);
+}
+
+.my-sales-table .amount { text-align: right; }
+.my-sales-table .method { text-transform: capitalize; }
+.my-sales-empty { text-align: center; color: var(--gray-500); padding: 20px; }
+
+.my-sales-actions {
+  padding: 16px 22px 20px;
+  display: flex;
+  justify-content: flex-end;
+}

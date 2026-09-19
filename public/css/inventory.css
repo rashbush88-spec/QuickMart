@@ -1,0 +1,859 @@
+/**
+ * ============================================================
+ * inventory.css - Styles for the Inventory Management Page
+ * ============================================================
+ * This stylesheet covers:
+ *   - Sidebar navigation layout
+ *   - Top header bar
+ *   - Stat cards and overview widgets
+ *   - Data tables (stock levels, movements)
+ *   - Filters and search bar
+ *   - Stock adjustment modal
+ *   - Alert cards
+ *   - Toast notifications
+ *   - Category chart (CSS-only horizontal bars)
+ *   - Responsive adjustments
+ * ============================================================
+ */
+
+
+/* ── CSS Variables (design tokens) ─────────────────────────── */
+:root {
+  --primary-color: #1a5632;       /* deep green - QuickMart brand */
+  --primary-light: #2d8a56;       /* lighter green for hovers     */
+  --sidebar-bg: #111827;          /* dark sidebar background       */
+  --sidebar-width: 250px;
+  --header-height: 65px;
+  --text-dark: #1f2937;
+  --text-muted: #6b7280;
+  --border-color: #e5e7eb;
+  --bg-light: #f3f4f6;
+  --white: #ffffff;
+  --green: #059669;
+  --green-bg: #d1fae5;
+  --orange: #d97706;
+  --orange-bg: #fef3c7;
+  --red: #dc2626;
+  --red-bg: #fee2e2;
+  --blue: #2563eb;
+  --blue-bg: #dbeafe;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --radius: 8px;
+  --transition: all 0.2s ease;
+}
+
+
+/* ── Reset & Base ──────────────────────────────────────────── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+  display: flex;              /* sidebar + main sit side by side */
+  min-height: 100vh;
+}
+
+
+/* ── Sidebar ───────────────────────────────────────────────── */
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--sidebar-bg);
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 100;
+  transition: transform 0.3s ease;
+}
+
+/* Brand area at top of sidebar */
+.sidebar-brand {
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+}
+.sidebar-brand h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #34d399;          /* bright green for the brand name */
+  letter-spacing: 0.5px;
+}
+
+/* Navigation links */
+.sidebar-nav {
+  flex: 1;                 /* take up remaining space */
+  padding: 15px 0;
+  overflow-y: auto;        /* scroll if many links */
+}
+.sidebar-nav ul {
+  list-style: none;
+}
+.sidebar-nav li {
+  margin: 2px 0;
+}
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  color: #d1d5db;
+  text-decoration: none;
+  font-size: 0.95rem;
+  border-left: 3px solid transparent;
+  transition: var(--transition);
+}
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--white);
+}
+.nav-link.active {
+  background: rgba(52, 211, 153, 0.1);
+  color: #34d399;
+  border-left-color: #34d399;
+  font-weight: 600;
+}
+.nav-icon {
+  font-size: 1.1rem;
+  width: 24px;
+  text-align: center;
+}
+
+/* Alert badge next to nav link text */
+.alert-badge {
+  background: var(--red);
+  color: var(--white);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  margin-left: auto;
+}
+
+/* User info at bottom of sidebar */
+.sidebar-user {
+  padding: 15px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+.user-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--white);
+}
+.user-role {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  text-transform: capitalize;
+  margin-top: 2px;
+}
+.logout-btn {
+  margin-top: 10px;
+  width: 100%;
+  padding: 8px;
+  background: rgba(220, 38, 38, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: var(--transition);
+}
+.logout-btn:hover {
+  background: rgba(220, 38, 38, 0.3);
+}
+
+
+/* ── Main Content Area ─────────────────────────────────────── */
+.main-content {
+  margin-left: var(--sidebar-width);   /* offset by sidebar width */
+  flex: 1;
+  min-height: 100vh;
+}
+
+
+/* ── Top Header Bar ────────────────────────────────────────── */
+.top-header {
+  height: var(--header-height);
+  background: var(--white);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 25px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: var(--shadow-sm);
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.header-left h1 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+.header-right p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+.header-right span {
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+/* Hamburger button (hidden on desktop, shown on mobile) */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-dark);
+}
+
+
+/* ── Tab Content Sections ──────────────────────────────────── */
+/* Only the "active" tab is visible */
+.tab-content {
+  display: none;
+  padding: 25px;
+  animation: fadeIn 0.3s ease;
+}
+.tab-content.active {
+  display: block;
+}
+
+/* Simple fade-in when switching tabs */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ── Stat Cards Grid (Overview) ────────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 25px;
+}
+.stat-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  border-left: 4px solid var(--primary-color);
+}
+.stat-card h3 {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+/* Color variants for stat cards */
+.stat-green  { border-left-color: var(--green); }
+.stat-green .stat-number  { color: var(--green); }
+.stat-orange { border-left-color: var(--orange); }
+.stat-orange .stat-number { color: var(--orange); }
+.stat-red    { border-left-color: var(--red); }
+.stat-red .stat-number    { color: var(--red); }
+
+
+/* ── Inventory Value Card ──────────────────────────────────── */
+.inventory-value-card {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  color: var(--white);
+  border-radius: var(--radius);
+  padding: 25px;
+  margin-bottom: 25px;
+  box-shadow: var(--shadow-md);
+}
+.inventory-value-card h3 {
+  font-size: 0.9rem;
+  font-weight: 500;
+  opacity: 0.9;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.value-amount {
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+
+
+/* ── Generic Card ──────────────────────────────────────────── */
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 25px;
+}
+.card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: var(--text-dark);
+}
+
+
+/* ── Category Chart (CSS horizontal bars) ──────────────────── */
+.category-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.chart-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.chart-label {
+  width: 160px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: right;
+  flex-shrink: 0;
+}
+.chart-bar-container {
+  flex: 1;
+  background: var(--bg-light);
+  border-radius: 4px;
+  height: 24px;
+  overflow: hidden;
+}
+.chart-bar {
+  height: 100%;
+  background: var(--primary-light);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+  min-width: 30px;
+}
+.chart-bar span {
+  font-size: 0.75rem;
+  color: var(--white);
+  font-weight: 600;
+}
+
+
+/* ── Data Tables ───────────────────────────────────────────── */
+.table-wrapper {
+  overflow-x: auto;              /* horizontal scroll on small screens */
+}
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.data-table thead {
+  background: var(--bg-light);
+}
+.data-table th {
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  border-bottom: 2px solid var(--border-color);
+  white-space: nowrap;
+}
+.data-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+.data-table tbody tr:hover {
+  background: #f9fafb;
+}
+/* Empty state message shown when no data */
+.empty-row td {
+  text-align: center;
+  padding: 30px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+
+/* ── Status Badges ─────────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.badge-green  { background: var(--green-bg);  color: var(--green); }
+.badge-orange { background: var(--orange-bg); color: var(--orange); }
+.badge-red    { background: var(--red-bg);    color: var(--red); }
+.badge-blue   { background: var(--blue-bg);   color: var(--blue); }
+
+
+/* ── Stock Level Progress Bar ──────────────────────────────── */
+.stock-bar-container {
+  width: 100px;
+  height: 8px;
+  background: var(--bg-light);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.stock-bar {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+.stock-bar.green  { background: var(--green); }
+.stock-bar.orange { background: var(--orange); }
+.stock-bar.red    { background: var(--red); }
+
+
+/* ── Filters Row ───────────────────────────────────────────── */
+.filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 15px 20px;
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+.search-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px 15px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  outline: none;
+  transition: var(--transition);
+}
+.search-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(26, 86, 50, 0.1);
+}
+.filter-select {
+  padding: 10px 15px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  background: var(--white);
+  outline: none;
+  cursor: pointer;
+}
+.filter-select:focus {
+  border-color: var(--primary-color);
+}
+
+/* Status filter buttons group */
+.status-filters {
+  display: flex;
+  gap: 5px;
+}
+.filter-btn {
+  padding: 8px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.filter-btn:hover {
+  background: var(--bg-light);
+  color: var(--text-dark);
+}
+.filter-btn.active {
+  background: var(--primary-color);
+  color: var(--white);
+  border-color: var(--primary-color);
+}
+
+/* Date filter inputs */
+.date-filters {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.date-filters label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.date-filters input[type="date"] {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  outline: none;
+}
+.date-filters input[type="date"]:focus {
+  border-color: var(--primary-color);
+}
+
+
+/* ── Export Row ─────────────────────────────────────────────── */
+.export-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 15px;
+}
+
+
+/* ── Buttons ───────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn-primary {
+  background: var(--primary-color);
+  color: var(--white);
+}
+.btn-primary:hover {
+  background: var(--primary-light);
+}
+.btn-secondary {
+  background: var(--white);
+  color: var(--text-dark);
+  border: 1px solid var(--border-color);
+}
+.btn-secondary:hover {
+  background: var(--bg-light);
+}
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+}
+.btn-orange {
+  background: var(--orange);
+  color: var(--white);
+}
+.btn-orange:hover {
+  background: #b45309;
+}
+.btn-red {
+  background: var(--red);
+  color: var(--white);
+}
+.btn-red:hover {
+  background: #b91c1c;
+}
+
+
+/* ── Alerts Section ────────────────────────────────────────── */
+.alerts-section {
+  margin-bottom: 30px;
+}
+.section-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-dark);
+}
+.alerts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 15px;
+}
+.alert-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.alert-card.low-stock {
+  border-left: 4px solid var(--orange);
+}
+.alert-card.out-of-stock {
+  border-left: 4px solid var(--red);
+}
+.alert-card-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+}
+.alert-card-info {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.alert-card-info strong {
+  color: var(--text-dark);
+}
+.alert-card-actions {
+  margin-top: 5px;
+}
+
+/* Empty alerts message */
+.no-alerts {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+
+/* ── Modal ─────────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;               /* hidden by default */
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+.modal-overlay.show {
+  display: flex;               /* shown when .show class is added */
+}
+.modal {
+  background: var(--white);
+  border-radius: var(--radius);
+  width: 90%;
+  max-width: 480px;
+  box-shadow: var(--shadow-md);
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+.modal-header h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  line-height: 1;
+}
+.modal-close:hover {
+  color: var(--text-dark);
+}
+.modal-body {
+  padding: 20px;
+}
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 15px 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Form elements inside the modal */
+.form-group {
+  margin-bottom: 15px;
+}
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+}
+.form-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  outline: none;
+  transition: var(--transition);
+}
+.form-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(26, 86, 50, 0.1);
+}
+.form-input.readonly {
+  background: var(--bg-light);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+.modal-error {
+  color: var(--red);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 5px;
+}
+
+
+/* ── Notification Toast ────────────────────────────────────── */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 14px 22px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  z-index: 300;
+  animation: slideIn 0.3s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+.notification.success {
+  background: var(--green);
+  color: var(--white);
+}
+.notification.error {
+  background: var(--red);
+  color: var(--white);
+}
+.notification.info {
+  background: var(--blue);
+  color: var(--white);
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+
+/* ── Add Product Row ───────────────────────────────────────── */
+.add-product-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+/* ── Form Row (two columns side-by-side) ───────────────────── */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ── Barcode Input Row (input + button side-by-side) ───────── */
+.barcode-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.barcode-input-row .form-input {
+  flex: 1;
+}
+
+/* ── Add Product modal wider ───────────────────────────────── */
+#addProductModal .modal {
+  max-width: 560px;
+}
+
+
+/* ── Responsive Design ─────────────────────────────────────── */
+
+/* Tablets and smaller laptops */
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .alerts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile devices */
+@media (max-width: 768px) {
+  /* Sidebar slides off-screen on mobile */
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* Show the hamburger menu button */
+  .menu-toggle {
+    display: block;
+  }
+
+  /* Main content takes full width on mobile */
+  .main-content {
+    margin-left: 0;
+  }
+
+  /* Header adjustments */
+  .header-left h1 {
+    font-size: 1.1rem;
+  }
+
+  /* Stack filter elements vertically */
+  .filters-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .status-filters {
+    flex-wrap: wrap;
+  }
+  .date-filters {
+    flex-direction: column;
+  }
+
+  /* Stat cards single column */
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Chart label narrower */
+  .chart-label {
+    width: 110px;
+    font-size: 0.8rem;
+  }
+}

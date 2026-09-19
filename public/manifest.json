@@ -1,0 +1,41 @@
+{
+  "name": "QuickMart POS - Shop Management",
+  "short_name": "QuickMart",
+  "description": "Point of sale, stock control and sales reports for shops and supermarkets in Ghana.",
+  "start_url": "index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f0f2f5",
+  "theme_color": "#006B3F",
+  "lang": "en-GH",
+  "categories": ["business", "productivity", "finance"],
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Open the till",
+      "short_name": "Till",
+      "url": "cashier.html",
+      "description": "Go straight to the point of sale screen"
+    },
+    {
+      "name": "Check stock",
+      "short_name": "Stock",
+      "url": "inventory.html",
+      "description": "Open the inventory screen"
+    }
+  ]
+}

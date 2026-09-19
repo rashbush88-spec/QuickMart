@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - QuickMart Ghana</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#006B3F">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">&#128722;</div>
+        <h2 data-shop-name>QuickMart Ghana</h2>
+        <span>Shop ID: <strong data-shop-code>--</strong></span>
+      </div>
+      <ul class="sidebar-nav">
+        <li><a class="nav-link active" data-tab="dashboard" onclick="switchTab('dashboard')"><span class="nav-icon">&#128200;</span> Dashboard</a></li>
+        <li><a class="nav-link" data-tab="products" onclick="switchTab('products')"><span class="nav-icon">&#128230;</span> Products</a></li>
+        <li><a class="nav-link" data-tab="sales" onclick="switchTab('sales')"><span class="nav-icon">&#128176;</span> Sales</a></li>
+        <li><a class="nav-link" data-tab="users" onclick="switchTab('users')"><span class="nav-icon">&#128101;</span> Users</a></li>
+        <li><a class="nav-link" data-tab="staff-activity" onclick="switchTab('staff-activity')"><span class="nav-icon">&#128339;</span> Staff Activity</a></li>
+        <li><a class="nav-link" data-tab="categories" onclick="switchTab('categories')"><span class="nav-icon">&#127991;</span> Categories</a></li>
+        <li><a class="nav-link" data-tab="settings" onclick="switchTab('settings')"><span class="nav-icon">&#9881;</span> Shop Settings</a></li>
+      </ul>
+      <div class="sidebar-user">
+        <div class="user-avatar" id="userAvatar">K</div>
+        <div class="user-details">
+          <div class="user-name" id="userName">Admin</div>
+          <div class="user-role" id="userRole">Administrator</div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="Auth.logout()">Logout</button>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <header class="top-header">
+        <div>
+          <button class="mobile-toggle" onclick="toggleSidebar()">&#9776;</button>
+          <h1 id="pageTitle">Dashboard</h1>
+        </div>
+        <span class="welcome-text">Welcome, <strong id="welcomeName">Admin</strong></span>
+      </header>
+
+      <div class="tab-content">
+        <!-- DASHBOARD TAB -->
+        <section class="tab-section active" id="tab-dashboard">
+          <!-- 4 stat cards -->
+          <div class="stat-cards">
+            <div class="stat-card"><div class="stat-icon green">&#128230;</div><div class="stat-info"><h3>Total Products</h3><div class="stat-value" id="statProducts">0</div></div></div>
+            <div class="stat-card"><div class="stat-icon blue">&#128176;</div><div class="stat-info"><h3>Total Sales</h3><div class="stat-value" id="statSales">GH&#8373; 0.00</div></div></div>
+            <div class="stat-card"><div class="stat-icon orange">&#9888;</div><div class="stat-info"><h3>Low Stock Items</h3><div class="stat-value" id="statLowStock">0</div></div></div>
+            <div class="stat-card"><div class="stat-icon purple">&#128200;</div><div class="stat-info"><h3>Total Revenue</h3><div class="stat-value" id="statRevenue">GH&#8373; 0.00</div></div></div>
+          </div>
+
+          <!-- Charts + Recent -->
+          <div class="dashboard-grid">
+            <!-- Sales bar chart -->
+            <div class="dashboard-card">
+              <h3>Sales This Week</h3>
+              <div class="bar-chart" id="salesChart"></div>
+            </div>
+            <!-- Top selling -->
+            <div class="dashboard-card">
+              <h3>Top Selling Products</h3>
+              <ul class="top-list" id="topProducts"></ul>
+            </div>
+          </div>
+
+          <!-- Recent sales table -->
+          <div class="content-card">
+            <h3 class="section-title">Recent Sales</h3>
+            <div class="table-container">
+              <table>
+                <thead><tr><th>Receipt</th><th>Date</th><th>Items</th><th>Total</th><th>Payment</th><th>Cashier</th></tr></thead>
+                <tbody id="recentSalesBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- PRODUCTS TAB -->
+        <section class="tab-section" id="tab-products">
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <input type="text" class="search-input" id="productSearch" placeholder="Search products..." oninput="searchProducts()">
+              <!-- Filled from this shop's own categories by refreshCategoryDropdowns() -->
+              <select class="filter-select" id="categoryFilter" onchange="filterProducts()">
+                <option value="all">All Categories</option>
+              </select>
+            </div>
+            <div class="toolbar-right">
+              <button class="btn btn-primary" onclick="openProductModal()">+ Add Product</button>
+            </div>
+          </div>
+          <div class="content-card">
+            <div class="table-container">
+              <table>
+                <thead><tr><th>Barcode</th><th>Name</th><th>Category</th><th>Price (GH&#8373;)</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody id="productsBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- SALES TAB -->
+        <section class="tab-section" id="tab-sales">
+          <div class="summary-cards" id="salesSummary"></div>
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <input type="date" class="date-input" id="salesDateFrom" onchange="filterSales()">
+              <input type="date" class="date-input" id="salesDateTo" onchange="filterSales()">
+              <select class="filter-select" id="paymentFilter" onchange="filterSales()">
+                <option value="all">All Payments</option>
+                <option value="cash">Cash</option>
+                <option value="momo">Mobile Money</option>
+                <option value="card">Card</option>
+              </select>
+            </div>
+            <div class="toolbar-right">
+              <button class="btn btn-secondary" onclick="exportSalesCSV()">Export CSV</button>
+            </div>
+          </div>
+          <div class="content-card">
+            <div class="table-container">
+              <table>
+                <thead><tr><th>Receipt No</th><th>Date</th><th>Items</th><th>Total</th><th>Payment</th><th>Cashier</th></tr></thead>
+                <tbody id="salesBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- USERS TAB -->
+        <section class="tab-section" id="tab-users">
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <h3 class="section-title">User Management</h3>
+            </div>
+            <div class="toolbar-right">
+              <button class="btn btn-primary" onclick="openUserModal()">+ Add User</button>
+            </div>
+          </div>
+          <div class="content-card">
+            <div class="table-container">
+              <table>
+                <thead><tr><th>Name</th><th>Email</th><th>Username</th><th>Role</th><th>Actions</th></tr></thead>
+                <tbody id="usersBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- STAFF ACTIVITY TAB -->
+        <section class="tab-section" id="tab-staff-activity">
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <h3 class="section-title">Staff Activity</h3>
+            </div>
+            <div class="toolbar-right">
+              <label class="activity-date-label" for="activityDate">Date</label>
+              <input type="date" id="activityDate" class="activity-date" onchange="loadStaffActivity()">
+            </div>
+          </div>
+
+          <div class="content-card">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Staff</th><th>Role</th><th>Logged in</th><th>Logged out</th>
+                    <th>Time on duty</th><th>Sales</th><th>Taken</th><th></th>
+                  </tr>
+                </thead>
+                <tbody id="staffActivityBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Filled when a cashier row is opened -->
+          <div id="cashierDayCard" class="content-card" style="display:none; margin-top:18px;"></div>
+        </section>
+
+        <!-- CATEGORIES TAB -->
+        <section class="tab-section" id="tab-categories">
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <h3 class="section-title">Your Product Categories</h3>
+            </div>
+            <div class="toolbar-right">
+              <button class="btn btn-primary" onclick="openCategoryModal()">+ Add Category</button>
+            </div>
+          </div>
+          <div class="content-card">
+            <p class="text-muted mb-3">
+              These are your shop's own categories. They fill the dropdown on the
+              product form and the buttons on the cashier screen.
+            </p>
+            <div class="table-container">
+              <table>
+                <thead><tr><th>Icon</th><th>Name</th><th>Products</th><th>Actions</th></tr></thead>
+                <tbody id="categoriesBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- SHOP SETTINGS TAB -->
+        <section class="tab-section" id="tab-settings">
+
+          <div class="content-card">
+            <h3 class="section-title">Shop Details</h3>
+            <p class="text-muted mb-3">Everything here prints on your receipts.</p>
+
+            <div class="settings-grid">
+              <div class="form-group"><label>Shop Name</label><input type="text" id="setName"></div>
+              <div class="form-group"><label>Slogan</label><input type="text" id="setSlogan" placeholder="Fresh. Fair. Fast."></div>
+              <div class="form-group"><label>Phone</label><input type="tel" id="setPhone"></div>
+              <div class="form-group"><label>TIN</label><input type="text" id="setTin"></div>
+              <div class="form-group"><label>Street / Landmark</label><input type="text" id="setAddress"></div>
+              <div class="form-group"><label>Town / City</label><input type="text" id="setCity"></div>
+              <div class="form-group"><label>Region</label><input type="text" id="setRegion"></div>
+              <div class="form-group"><label>Ghana Post GPS</label><input type="text" id="setDigitalAddress"></div>
+            </div>
+          </div>
+
+          <div class="content-card">
+            <h3 class="section-title">Receipt</h3>
+            <div class="settings-grid">
+              <div class="form-group"><label>Receipt Prefix</label><input type="text" id="setPrefix" maxlength="10" placeholder="QM"></div>
+              <div class="form-group"><label>Tax Rate (%)</label><input type="number" id="setTaxRate" min="0" max="100" step="0.01"></div>
+              <div class="form-group"><label>Tax Label</label><input type="text" id="setTaxLabel" placeholder="VAT"></div>
+              <div class="form-group"><label>Currency Symbol</label><input type="text" id="setCurrency" maxlength="6"></div>
+              <div class="form-group full"><label>Header Line</label><input type="text" id="setHeader" placeholder="Your shop name or branch"></div>
+              <div class="form-group full"><label>Footer Message</label><input type="text" id="setFooter" placeholder="Thank you for shopping with us!"></div>
+            </div>
+
+            <div class="logo-row">
+              <div>
+                <label>Shop Logo</label>
+                <input type="file" id="setLogo" accept="image/png,image/jpeg,image/webp">
+                <small class="text-muted">PNG or JPG, up to 2 MB. Shows at the top of the receipt.</small>
+              </div>
+              <div class="logo-preview" data-shop-logo></div>
+            </div>
+          </div>
+
+          <div class="content-card">
+            <h3 class="section-title">Mobile Money</h3>
+            <div class="settings-grid">
+              <div class="form-group">
+                <label>Provider</label>
+                <select id="setMomoProvider">
+                  <option value="">None</option>
+                  <option value="MTN">MTN</option>
+                  <option value="Telecel">Telecel</option>
+                  <option value="AirtelTigo">AirtelTigo</option>
+                </select>
+              </div>
+              <div class="form-group"><label>MoMo Number</label><input type="tel" id="setMomoNumber"></div>
+              <div class="form-group"><label>Registered Name</label><input type="text" id="setMomoName"></div>
+            </div>
+          </div>
+
+          <div class="settings-actions">
+            <button class="btn btn-primary" onclick="saveSettings()">Save Shop Details</button>
+          </div>
+
+          <!-- Billing -->
+          <div class="content-card" id="billingCard">
+            <h3 class="section-title">Subscription</h3>
+            <div id="billingSummary"><p class="text-muted">Loading...</p></div>
+            <div id="planList" class="plan-cards"></div>
+            <h4 class="mt-4 mb-2">Payment History</h4>
+            <div class="table-container">
+              <table>
+                <thead><tr><th>Date</th><th>Amount</th><th>Method</th><th>Reference</th><th>Status</th></tr></thead>
+                <tbody id="paymentsBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- PRODUCT MODAL -->
+  <div class="modal-overlay" id="productModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="productModalTitle">Add Product</h2>
+        <button class="modal-close" onclick="closeProductModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editProductId">
+        <div class="form-group"><label>Product Name</label><input type="text" id="prodName" placeholder="e.g. Adom Rice (5kg)"></div>
+        <div class="form-group"><label>Category</label><select id="prodCategory"><option value="">&#8212; No category &#8212;</option></select></div>
+        <div class="form-group"><label>Price (GH&#8373;)</label><input type="number" id="prodPrice" min="0" step="0.01" placeholder="0.00"></div>
+        <div class="form-group"><label>Barcode</label><input type="text" id="prodBarcode" placeholder="Auto-generated" readonly></div>
+        <div class="form-group"><label>Stock Quantity</label><input type="number" id="prodStock" min="0" placeholder="0"></div>
+        <div class="form-group"><label>Minimum Stock</label><input type="number" id="prodMinStock" min="0" placeholder="0"></div>
+        <div class="form-group"><label>Unit</label><select id="prodUnit"><option value="pcs">Pieces (pcs)</option><option value="kg">Kilogram (kg)</option><option value="bag">Bag</option><option value="bottle">Bottle</option><option value="jar">Jar</option><option value="box">Box</option></select></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeProductModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveProduct()">Save Product</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- USER MODAL -->
+  <div class="modal-overlay" id="userModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="userModalTitle">Add User</h2>
+        <button class="modal-close" onclick="closeUserModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editUserId">
+        <div class="form-group"><label>Full Name</label><input type="text" id="userFullName" placeholder="e.g. Kwame Asante"></div>
+        <div class="form-group"><label>Email</label><input type="email" id="userEmail" placeholder="e.g. staff@supermarket.com"></div>
+        <div class="form-group">
+          <label>Username <small>(optional)</small></label>
+          <input type="text" id="userUsername" placeholder="e.g. ama" autocomplete="off">
+          <small class="text-muted">They can log in with this instead of their email. Letters, numbers, dots, underscores and hyphens.</small>
+        </div>
+        <div class="form-group"><label>Password</label><input type="password" id="userPassword" placeholder="Enter password"></div>
+        <div class="form-group"><label>Role</label><select id="userRoleSelect"><option value="admin">Admin</option><option value="cashier">Cashier</option><option value="inventory">Inventory Manager</option></select></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeUserModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveUser()">Save User</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SALE DETAILS MODAL -->
+  <div class="modal-overlay" id="saleModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Sale Details</h2>
+        <button class="modal-close" onclick="closeSaleModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="saleDetailsBody"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeSaleModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CATEGORY MODAL -->
+  <div class="modal-overlay" id="categoryModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="categoryModalTitle">Add Category</h2>
+        <button class="modal-close" onclick="closeCategoryModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editCategoryId">
+        <div class="form-group"><label>Category Name</label><input type="text" id="catName" placeholder="e.g. Frozen Foods"></div>
+
+        <div class="form-group">
+          <label>Picture</label>
+          <div class="cat-picture-row">
+            <div class="cat-picture-preview" id="catPicturePreview"><span>&#128230;</span></div>
+            <div class="cat-picture-actions">
+              <input type="file" id="catImageFile" accept="image/png,image/jpeg,image/webp" onchange="previewCategoryImage()">
+              <button type="button" class="btn-link-danger" id="catRemoveImageBtn" onclick="removeCategoryImage()" style="display:none">Remove picture</button>
+              <small>PNG, JPG or WEBP. Up to 2 MB.</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group"><label>Emoji <small>(used when there is no picture)</small></label><input type="text" id="catIcon" maxlength="4" placeholder="&#127851;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeCategoryModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveCategory()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTIFICATION TOAST -->
+  <div class="notification-toast" id="toast"></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/shop.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/admin-extra.js"></script>
+  <script src="js/pwa.js"></script>
+</body>
+</html>
